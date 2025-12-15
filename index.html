@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>หิวจัง - Food Delivery</title>
+    <!-- Google Fonts: Mali (Handwritten/Playful style) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Icon Library -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+      :root {
+          /* Palette Configuration */
+          --yellow: #FFD93D;
+          --pink: #FF6B9D;
+          --blue: #4ECDC4;
+          --orange: #FF8E72;
+          --cream: #FFF9F0;
+          --text-dark: #2D3436;
+          --white: #FFFFFF;
+
+          --blob-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+          --pill-radius: 50px;
+          --card-radius: 24px;
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Mali', cursive; /* Handwritten font */
+          -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+          /* Polka dot background pattern */
+          background-color: var(--cream);
+          background-image: radial-gradient(#FFD93D 15%, transparent 16%),
+                            radial-gradient(#4ECDC4 15%, transparent 16%);
+          background-size: 20px 20px;
+          background-position: 0 0, 10px 10px;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+      }
+
+      .app-container {
+          width: 100%;
+          max-width: 414px;
+          height: 100vh;
+          max-height: 900px;
+          background-color: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(5px);
+          position: relative;
+          /* overflow-y: auto;  <-- ลบอันเดิมออก */
+          overflow: hidden; /* <-- เปลี่ยนเป็น hidden เพื่อตรึงองค์ประกอบหลัก */
+          box-shadow: 0 0 0 10px rgba(255, 217, 61, 0.5); /* Fun border frame */
+          /* scrollbar-width: none; <-- ย้ายไปที่ content-wrapper */
+          /* padding-bottom: 90px; <-- ย้ายไปที่ content-wrapper */
+      }
+
+      /* .app-container::-webkit-scrollbar { display: none; } <-- ย้ายไปที่ content-wrapper */
+
+      /* เพิ่ม Class ใหม่สำหรับส่วนเนื้อหาที่เลื่อนได้ */
+      .content-wrapper {
+          height: 100%;
+          overflow-y: auto;
+          padding-bottom: 110px; /* เว้นที่ให้ Nav bar ด้านล่าง */
+          scrollbar-width: none;
+      }
+      .content-wrapper::-webkit-scrollbar { display: none; }
+
+          overflow-x: hidden;
+          box-shadow: 0 0 0 10px rgba(255, 217, 61, 0.5); /* Fun border frame */
+          scrollbar-width: none;
+          padding-bottom: 90px;
+      }
+
+      .app-container::-webkit-scrollbar { display: none; }
+
+      /* --- Animations --- */
+      @keyframes bounce {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+      }
+
+      @keyframes wiggle {
+          0%, 100% { transform: rotate(-3deg); }
+          50% { transform: rotate(3deg); }
+      }
+
+      @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+          100% { transform: translateY(0px); }
+      }
+
+      /* --- Header --- */
+      header {
+          padding: 24px;
+          background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0) 100%);
+      }
+
+      .header-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+      }
+
+      .brand-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .logo-box {
+          width: 50px;
+          height: 50px;
+          background-color: var(--yellow);
+          border-radius: var(--blob-radius);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 1.8rem;
+          animation: bounce 3s infinite ease-in-out;
+          box-shadow: 3px 3px 0px var(--text-dark);
+      }
+
+      .greeting h1 {
+          font-size: 1.4rem;
+          color: var(--text-dark);
+          line-height: 1.2;
+      }
+
+      .greeting span {
+          color: var(--pink);
+          font-weight: 700;
+      }
+
+      .avatar {
+          width: 45px;
+          height: 45px;
+          background-color: var(--blue);
+          border-radius: 50%;
+          border: 2px solid var(--text-dark);
+          overflow: hidden;
+      }
+      .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+      /* --- Search Bar --- */
+      .search-container {
+          position: relative;
+          margin-bottom: 10px;
+      }
+
+      .search-input {
+          width: 100%;
+          padding: 14px 20px 14px 50px;
+          border-radius: var(--pill-radius);
+          border: 2px solid var(--text-dark);
+          background-color: var(--white);
+          font-size: 1rem;
+          color: var(--text-dark);
+          box-shadow: 4px 4px 0px var(--blue);
+          outline: none;
+          transition: all 0.2s;
+      }
+
+      .search-input:focus {
+          transform: translate(2px, 2px);
+          box-shadow: 2px 2px 0px var(--blue);
+      }
+
+      .search-icon {
+          position: absolute;
+          left: 18px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.4rem;
+          color: var(--text-dark);
+      }
+
+      /* --- Categories --- */
+      .categories-grid {
+          padding: 10px 24px;
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          overflow-x: auto;
+      }
+      .categories-grid::-webkit-scrollbar { display: none; }
+
+      .cat-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          min-width: 70px;
+          cursor: pointer;
+          transition: transform 0.2s;
+      }
+      .cat-item:hover { transform: scale(1.05); }
+
+      .cat-circle {
+          width: 65px;
+          height: 65px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 2rem;
+          border: 2px solid var(--text-dark);
+          box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+      }
+
+      .cat-label {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--text-dark);
+      }
+
+      /* --- Promo Banner --- */
+      .promo-section {
+          padding: 20px 24px;
+      }
+
+      .promo-banner {
+          background: linear-gradient(135deg, var(--pink), var(--orange));
+          border-radius: 20px;
+          padding: 20px;
+          border: 2px solid var(--text-dark);
+          box-shadow: 5px 5px 0px var(--text-dark);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          color: var(--white);
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+      }
+
+      .promo-banner:active {
+          transform: translate(2px, 2px);
+          box-shadow: 3px 3px 0px var(--text-dark);
+      }
+
+      .promo-text { z-index: 2; width: 65%; }
+      .promo-text h2 { font-size: 1.5rem; margin-bottom: 4px; text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
+      .promo-text p { font-size: 1rem; font-weight: 500; }
+
+      .promo-tag {
+          background-color: var(--yellow);
+          color: var(--text-dark);
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 700;
+          margin-top: 8px;
+          transform: rotate(-2deg);
+          border: 1px solid var(--text-dark);
+      }
+
+      .promo-deco {
+          font-size: 4rem;
+          position: absolute;
+          right: -10px;
+          bottom: -10px;
+          animation: wiggle 2s infinite ease-in-out;
+      }
+
+      /* --- Popular Section --- */
+      .section-title {
+          padding: 0 24px 16px;
+          font-size: 1.3rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+
+      .title-deco {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          background: var(--blue);
+          border-radius: 50%;
+          border: 1px solid var(--text-dark);
+      }
+
+      .shop-list {
+          padding: 0 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+      }
+
+      .shop-card {
+          background: var(--white);
+          border-radius: var(--card-radius);
+          border: 2px solid; /* Dynamic border color via style */
+          overflow: hidden;
+          position: relative;
+          box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+          transition: all 0.2s;
+      }
+
+      .shop-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
+      }
+
+      .card-image-box {
+          height: 150px;
+          background-color: #ddd;
+          position: relative;
+      }
+      .card-image-box img { width: 100%; height: 100%; object-fit: cover; }
+
+      .tag-badge {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          padding: 6px 12px;
+          border-radius: 12px;
+          color: var(--white);
+          font-weight: 700;
+          font-size: 0.8rem;
+          border: 2px solid var(--text-dark);
+          transform: rotate(3deg);
+          box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+      }
+
+      .tag-best { background-color: var(--orange); }
+      .tag-new { background-color: var(--blue); }
+
+      .card-info { padding: 16px; }
+
+      .shop-name {
+          font-size: 1.2rem;
+          font-weight: 700;
+          margin-bottom: 4px;
+          color: var(--text-dark);
+      }
+
+      .shop-details {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #666;
+      }
+
+      .rating-box {
+          background-color: var(--yellow);
+          padding: 2px 8px;
+          border-radius: 8px;
+          border: 1px solid var(--text-dark);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.8rem;
+          color: var(--text-dark);
+      }
+
+      /* --- FAB & Nav --- */
+      .fab-cart {
+          position: absolute; /* เปลี่ยนจาก fixed เป็น absolute อิงกับ app-container */
+          bottom: 100px;
+          right: 20px;
+          width: 65px;
+          height: 65px;
+          background-color: var(--yellow);
+          border-radius: 30px; /* Squircle */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 2rem;
+          color: var(--text-dark);
+          border: 2px solid var(--text-dark);
+          box-shadow: 4px 4px 0px var(--text-dark);
+          z-index: 200;
+          cursor: pointer;
+          transition: transform 0.2s;
+          animation: float 3s infinite ease-in-out;
+      }
+
+      .fab-cart:active { transform: scale(0.95); box-shadow: 2px 2px 0px var(--text-dark); }
+
+      .cart-badge {
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          background-color: var(--pink);
+          color: white;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          font-size: 0.8rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: 1px solid var(--text-dark);
+          font-weight: bold;
+      }
+
+      .bottom-bar {
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          right: 20px;
+          background-color: var(--text-dark);
+          border-radius: 30px;
+          height: 65px;
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          padding: 0 10px;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+          z-index: 1000; /* เพิ่ม z-index ให้แน่ใจว่าอยู่บนสุด */
+      }
+
+      .nav-btn {
+          color: #888;
+          font-size: 1.8rem;
+          padding: 10px;
+          transition: 0.2s;
+      }
+      .nav-btn.active {
+          color: var(--yellow);
+          transform: translateY(-5px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Wrapper สำหรับเนื้อหาที่ Scroll ได้ -->
+      <div class="content-wrapper">
+        <!-- Header -->
+        <header>
+          <div class="header-top">
+            <div class="brand-wrapper">
+              <div class="logo-box">😋</div>
+              <div class="greeting">
+                <h1>สวัสดี! <br /><span>วันนี้อยากกินอะไร?</span> 🍕</h1>
+              </div>
+            </div>
+            <div class="avatar">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+                alt="User"
+              />
+            </div>
+          </div>
+
+          <div class="search-container">
+            <i class="ph-bold ph-magnifying-glass search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="ค้นหาอาหารที่ชอบ..."
+            />
+          </div>
+        </header>
+
+        <!-- Categories -->
+        <div class="categories-grid">
+          <div class="cat-item">
+            <div
+              class="cat-circle"
+              style="background-color: #ffedd5; color: var(--orange)"
+            >
+              🍜
+            </div>
+            <span class="cat-label">ก๋วยเตี๋ยว</span>
+          </div>
+          <div class="cat-item">
+            <div
+              class="cat-circle"
+              style="background-color: #e0f2fe; color: var(--blue)"
+            >
+              🍛
+            </div>
+            <span class="cat-label">ราดแกง</span>
+          </div>
+          <div class="cat-item">
+            <div
+              class="cat-circle"
+              style="background-color: #fce7f3; color: var(--pink)"
+            >
+              🍔
+            </div>
+            <span class="cat-label">ฟาสต์ฟู้ด</span>
+          </div>
+          <div class="cat-item">
+            <div
+              class="cat-circle"
+              style="background-color: #fef9c3; color: var(--yellow)"
+            >
+              🧁
+            </div>
+            <span class="cat-label">ของหวาน</span>
+          </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="promo-section">
+          <div class="promo-banner">
+            <div class="promo-text">
+              <h2>ลดทันที 50.-</h2>
+              <p>เมื่อสั่งครบ 300 บาท</p>
+              <div class="promo-tag">CODE: HIWJUNG</div>
+            </div>
+            <div class="promo-deco">🛵</div>
+          </div>
+        </div>
+
+        <!-- Popular Shops -->
+        <div class="section-title">
+          <span class="title-deco"></span> ร้านยอดนิยม
+        </div>
+
+        <div class="shop-list">
+          <!-- Shop 1 -->
+          <div class="shop-card" style="border-color: var(--orange)">
+            <div class="card-image-box">
+              <img
+                src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=500&q=80"
+                alt="Burger"
+              />
+              <div class="tag-badge tag-best">ขายดี! 🔥</div>
+            </div>
+            <div class="card-info">
+              <div class="shop-name">เบอร์เกอร์ลุงหนวด</div>
+              <div class="shop-details">
+                <span>🍔 อเมริกัน • 20 นาที</span>
+                <div class="rating-box">
+                  <i class="ph-fill ph-star"></i> 4.9
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shop 2 -->
+          <div class="shop-card" style="border-color: var(--blue)">
+            <div class="card-image-box">
+              <img
+                src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=500&q=80"
+                alt="Pasta"
+              />
+              <div class="tag-badge tag-new">ใหม่! ✨</div>
+            </div>
+            <div class="card-info">
+              <div class="shop-name">พาสต้าเส้นสด</div>
+              <div class="shop-details">
+                <span>🍝 อิตาเลียน • 30 นาที</span>
+                <div class="rating-box">
+                  <i class="ph-fill ph-star"></i> 4.5
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shop 3 -->
+          <div class="shop-card" style="border-color: var(--pink)">
+            <div class="card-image-box">
+              <img
+                src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=500&q=80"
+                alt="Ice Cream"
+              />
+            </div>
+            <div class="card-info">
+              <div class="shop-name">ไอติมกะทิสด</div>
+              <div class="shop-details">
+                <span>🍨 ของหวาน • 10 นาที</span>
+                <div class="rating-box">
+                  <i class="ph-fill ph-star"></i> 4.8
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 40px"></div>
+        </div>
+      </div>
+      <!-- ปิด .content-wrapper -->
+
+      <!-- Floating Action Button (อยู่นอก wrapper) -->
+      <div class="fab-cart">
+        🛒
+        <div class="cart-badge">2</div>
+      </div>
+
+      <!-- Bottom Navigation (อยู่นอก wrapper) -->
+      <div class="bottom-bar">
+        <div class="nav-btn active"><i class="ph-fill ph-house"></i></div>
+        <div class="nav-btn"><i class="ph-bold ph-heart"></i></div>
+        <div class="nav-btn"><i class="ph-bold ph-ticket"></i></div>
+        <div class="nav-btn"><i class="ph-bold ph-user"></i></div>
+      </div>
+    </div>
+  </body>
+</html>
